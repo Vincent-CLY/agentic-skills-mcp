@@ -58,6 +58,8 @@ Review Team
 Knowledge-Base:
 Graphify
 Annotated-Illustration
+3brown1blue (Manim Python Library for animated explanation)
+Ask for AI to generate interactive presentation and 3D model visualization
 Exa
 Nvidia Auto Ontology
 
