@@ -26,6 +26,7 @@ Mobbin
 reactbits.dev
 Relume.ai
 Landbook
+curated.design
 Godly.website
 dark.design
 startupwebsites.co
