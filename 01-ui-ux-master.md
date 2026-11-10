@@ -48,4 +48,4 @@ When the user asks for a specific component style, layout inspiration, or live r
 - **Cross-Framework Component Patterns & Developer Assets**: `component.gallery`, `stacksorted.com` (sorted by specific CSS/UI element), `getlayers.ai`, `design-resources-for-developers`.
 - **Wireframes, Moodboards & Sitemap Structure**: `Relume.ai`, `Pinterest`.
 - **Real-World App User Flows & Screens**: `Mobbin`.
-- **High-Craft Landing Pages & Motion Showcases**: `Godly.website`, `Awwwards`, `motionsites`, `curated.design`, `Landbook`, `startupwebsites.co`, `dark.design` (dark mode aesthetics), `httpster.net`, `websitevice.com`.
+- **High-Craft Landing Pages & Motion Showcases**: `Godly.website`, `Awwwards`, `Dribble`, `Pinterest`, `motionsites`, `curated.design`, `Landbook`, `startupwebsites.co`, `dark.design` (dark mode aesthetics), `httpster.net`, `websitevice.com`.
