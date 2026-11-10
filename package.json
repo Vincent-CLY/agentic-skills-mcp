@@ -1,0 +1,14 @@
+{
+  "name": "agentic-skills-mcp",
+  "version": "1.0.0",
+  "description": "Universal Agent OS (Ponytail x ADHD x ASD-STE100) Auto-Installer",
+  "bin": {
+    "agentic-skills-mcp": "./install.sh",
+    "agent-os": "./install.sh"
+  },
+  "files": [
+    "install.sh",
+    "00-core-os.md",
+    "01-ui-ux-master.md"
+  ]
+}
