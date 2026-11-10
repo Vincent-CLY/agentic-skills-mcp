@@ -9,30 +9,30 @@ const GITHUB_BRANCH = process.env.AGENT_OS_BRANCH || 'main';
 const RAW_URL = `https://raw.githubusercontent.com/${GITHUB_REPO}/${GITHUB_BRANCH}`;
 const TARGET_DIR = process.env.INIT_CWD || process.cwd();
 
-// ANSI Color & Styling Tokens (Clack Aesthetic)
+// High-Contrast Terminal Color Tokens (No dark pitch-black text)
 const c = {
   reset: '\x1b[0m',
   bold: '\x1b[1m',
   dim: '\x1b[2m',
   cyan: '\x1b[36m',
+  brightCyan: '\x1b[96m',
   green: '\x1b[32m',
   yellow: '\x1b[33m',
-  gray: '\x1b[90m',
-  magenta: '\x1b[35m',
+  lightGray: '\x1b[37m',          // Clear readable silver white (replaces pitch-black)
+  mutedCyan: '\x1b[38;5;116m',     // Soft readable ice-blue for hints
+  border: '\x1b[38;5;245m',        // Crisp visible gray-white border
 };
 
 const sym = {
-  bar: `${c.gray}│${c.reset}`,
-  barEnd: `${c.gray}└${c.reset}`,
-  step: `${c.cyan}◇${c.reset}`,
+  bar: `${c.border}│${c.reset}`,
+  step: `${c.brightCyan}◇${c.reset}`,
   success: `${c.green}✔${c.reset}`,
   bulletOn: `${c.green}●${c.reset}`,
-  bulletOff: `${c.gray}○${c.reset}`,
-  radioOn: `${c.cyan}◉${c.reset}`,
-  radioOff: `${c.gray}◯${c.reset}`,
+  bulletOff: `${c.lightGray}○${c.reset}`,
+  radioOn: `${c.brightCyan}◉${c.reset}`,
+  radioOff: `${c.lightGray}◯${c.reset}`,
 };
 
-// Interactive Terminal Prompter Engine (Arrows, Space, Enter)
 async function runSelect({ title, items, multi = false }) {
   return new Promise((resolve) => {
     let cursor = 0;
@@ -45,17 +45,19 @@ async function runSelect({ title, items, multi = false }) {
 
     const render = (first = false) => {
       if (!first) {
-        output.write(`\x1b[${items.length + 1}A`); // Move cursor up
+        output.write(`\x1b[${items.length + 1}A`);
       }
-      output.write(`\r\x1b[K${sym.step}  ${c.bold}${title}${c.reset}\n`);
+      output.write(`\r\x1b[K${sym.step}  ${c.bold}${c.brightCyan}${title}${c.reset}\n`);
       items.forEach((item, idx) => {
         const isHover = idx === cursor;
         const icon = multi
           ? selected.has(idx) ? sym.bulletOn : sym.bulletOff
           : idx === cursor ? sym.radioOn : sym.radioOff;
-        const prefix = isHover ? `${c.cyan}❯${c.reset}` : ' ';
-        const text = isHover ? `${c.cyan}${item.label}${c.reset}` : `${item.label}`;
-        const hint = item.hint ? ` ${c.gray}(${item.hint})${c.reset}` : '';
+        
+        // Clear high-contrast styling: Active = Bright Cyan & Underline, Inactive = Clean White
+        const prefix = isHover ? `${c.brightCyan}❯${c.reset}` : ' ';
+        const text = isHover ? `${c.brightCyan}${c.bold}${item.label}${c.reset}` : `${c.lightGray}${item.label}${c.reset}`;
+        const hint = item.hint ? ` ${c.mutedCyan}(${item.hint})${c.reset}` : '';
         output.write(`\r\x1b[K${sym.bar}  ${prefix} ${icon} ${text}${hint}\n`);
       });
     };
@@ -65,7 +67,7 @@ async function runSelect({ title, items, multi = false }) {
     const onKey = (_, key) => {
       if (!key) return;
       if (key.ctrl && key.name === 'c') {
-        output.write(`\n\r${sym.barEnd}  ${c.yellow}Setup cancelled.${c.reset}\n`);
+        output.write(`\n\r${sym.bar}  ${c.yellow}Setup cancelled.${c.reset}\n`);
         process.exit(0);
       }
       if (key.name === 'up') {
@@ -81,10 +83,9 @@ async function runSelect({ title, items, multi = false }) {
       } else if (key.name === 'return') {
         input.removeListener('keypress', onKey);
         if (input.isTTY) input.setRawMode(false);
-        // Replace question block with clean completed checkmark
-        output.write(`\x1b[${items.length + 1}A\r\x1b[K${sym.success}  ${title}\n`);
+        output.write(`\x1b[${items.length + 1}A\r\x1b[K${sym.success}  ${c.bold}${title}${c.reset}\n`);
         for (let i = 0; i < items.length; i++) output.write(`\r\x1b[K`);
-        output.write(`\x1b[${items.length}A`); // Reset to after line
+        output.write(`\x1b[${items.length}A`);
         if (multi) resolve(Array.from(selected).map((idx) => items[idx].value));
         else resolve(items[cursor].value);
       }
@@ -114,8 +115,8 @@ function addGitExclude(fileOrFolder) {
 }
 
 async function main() {
-  console.log(`\n${c.cyan}┌  Agent-OS Setup${c.reset} ${c.dim}(Ponytail x ADHD x Modern UI)${c.reset}`);
-  console.log(`${sym.bar}  Target: ${c.dim}${TARGET_DIR}${c.reset}\n${sym.bar}`);
+  console.log(`\n${c.brightCyan}┌  Agent-OS Setup${c.reset} ${c.mutedCyan}(Ponytail x ADHD x High-Contrast UI)${c.reset}`);
+  console.log(`${sym.bar}  Target Directory: ${c.lightGray}${TARGET_DIR}${c.reset}\n${sym.bar}`);
 
   const scope = await runSelect({
     title: 'Where do you want to install the agent rules?',
@@ -148,7 +149,7 @@ async function main() {
   });
 
   console.log(`${sym.bar}`);
-  console.log(`${sym.bar}  ${c.dim}Fetching and syncing rule files...${c.reset}`);
+  console.log(`${sym.bar}  ${c.mutedCyan}Fetching and writing rule files...${c.reset}`);
 
   const coreOs = fetchFile('00-core-os.md');
   const uiMaster = fetchFile('01-ui-ux-master.md');
@@ -210,11 +211,10 @@ async function main() {
     }
   }
 
-  console.log(`${sym.bar}  ${sym.success} Rules written cleanly without touching native AGENTS.md.`);
+  console.log(`${sym.bar}  ${sym.success} Rule files configured successfully.`);
 
-  // Tooling Execution
   if (tooling === 'full' || tooling === 'core') {
-    console.log(`${sym.bar}  ${sym.step} Installing skills packs & Impeccable...`);
+    console.log(`${sym.bar}  ${sym.step} Installing skill packs & Impeccable...`);
     try {
       execSync('npx -y skills add mattpocock/skills obra/superpowers emilkowalski/skills -g', { stdio: 'ignore' });
       execSync('npm install -g impeccable', { stdio: 'ignore' });
@@ -234,7 +234,7 @@ async function main() {
   }
 
   console.log(`${sym.bar}`);
-  console.log(`${c.green}└  Installation complete! Everything is armed and ready.${c.reset}\n`);
+  console.log(`${c.green}└  Installation complete! All agents are armed and ready.${c.reset}\n`);
 }
 
 main().catch(console.error);
