@@ -1,23 +1,10 @@
 # 🚀 Agentic Skills & Rules OS (`agentic-skills-mcp`)
 
-> **[English Version](#-english-documentation)** | **[廣東話版本](#-廣東話版本-cantonese-documentation)**
+[English](#-english-documentation) | [廣東話 (Cantonese)](#-廣東話文檔-cantonese-documentation)
 
 ---
 
-## 🌐 Language Setting Notice / 語言設定重要提示
-
-* **Default Language**: The Agent OS is configured by default to converse in **natural Hong Kong Cantonese** mixed with English technical terms (Code, CLI commands, and identifiers remain strictly in English).
-* **How to change to English or other languages**:
-  Open `00-core-os.md` (or your project's `.clinerules/00-core-os.md` / `.github/instructions/00-core-os.instructions.md`), locate:
-  ```text
-  ## 1. I-Have-ADHD x ASD-STE100 Communication Protocol
-  1. **Language**: Always converse in natural Hong Kong Cantonese...
-  ```
-  Change this line to your preferred language (e.g., `Always converse in fluent English.` or `Always converse in Traditional Chinese / Japanese.`).
-
----
-
-# 🇬🇧 English Documentation
+# 🌐 English Documentation
 
 A zero-bloat, context-triggered **Universal AI Agent Operating System** designed for **VS Code (Cline & GitHub Copilot)**, **GitHub Codespaces**, **Cursor**, **Claude Code**, **OpenAI Codex**, and **Hermes**.
 
@@ -25,23 +12,33 @@ Instead of stuffing everything into a single giant prompt or overwriting framewo
 
 ---
 
+### ⚠️ Note on Default Language (Cantonese by Default)
+
+> **Important**: This OS is pre-configured to converse in **Natural Hong Kong Cantonese (廣東話口語)** mixed with English technical terms by default.
+>
+> **How to change to English, Mandarin, Japanese, or any other language:**
+> 1. Open `00-core-os.md`.
+> 2. Locate **`## 1. I-Have-ADHD x ASD-STE100 Communication Protocol`**.
+> 3. Modify item **`1. **Language**:`** to your preferred language (e.g., `Always converse in concise American English. Code/CLI strictly in English.`).
+> 4. Save or re-run the installer. All AI tools will immediately switch to your chosen language.
+
+---
+
 ## ⚡ 1. Quick Start & Installation (⏱️ < 1 Minute)
 
-Run a single command inside **any project terminal** (e.g., a fresh Next.js repo in VS Code) to fetch the latest rules and configure your environment interactively:
+Run any of the single-line commands below inside **any project terminal** (e.g., inside a fresh Next.js project in VS Code) to configure your environment interactively:
 
-### Option A: Run directly via `pnpm` or `npx` (No `git clone` required)
+### Option A1: Run via `npx` (No `git clone` needed)
 ```bash
-# via npx
 npx -y github:Vincent-CLY/agentic-skills-mcp
-
-# or via pnpm
-pnpm dlx github:Vincent-CLY/agentic-skills-mcp
-
-# or via bun
-bunx github:Vincent-CLY/agentic-skills-mcp
 ```
 
-### Option B: Run via `curl` (Zero Node/Git prerequisite)
+### Option A2: Run via `pnpm dlx` (Fast & clean)
+```bash
+pnpm dlx github:Vincent-CLY/agentic-skills-mcp
+```
+
+### Option B: Run via `curl` (Zero Node/Git pre-requisites)
 ```bash
 curl -fsSL https://raw.githubusercontent.com/Vincent-CLY/agentic-skills-mcp/main/install.sh | bash
 ```
@@ -52,10 +49,10 @@ bash install.sh --auto
 ```
 
 ### What the Installer Does:
-1. **Asks Where to Install**: Current Project only (default), Global machine directories, or Both.
-2. **Asks Which AI Tools You Use**: Creates **only** the folders for the tools you select (e.g., `.clinerules/` for Cline and `.github/instructions/` for Copilot)—zero unused folders on your hard drive.
-3. **Preserves Native `AGENTS.md`**: Uses additive rule folders so framework-native `AGENTS.md` files (like Next.js) remain 100% untouched.
-4. **Keeps Git Clean**: Automatically appends injected rule paths to `.git/info/exclude` so your `git status` stays clean.
+1. **Asks Where to Install**: Current project only (default), global system directories, or both.
+2. **Asks Which AI Tools You Use**: Generates **only** the folders for the tools you select (e.g., `.clinerules/` for Cline and `.github/instructions/` for Copilot)—zero unused folders.
+3. **Preserves Native `AGENTS.md`**: Uses additive modular rules so framework-native `AGENTS.md` files (such as Next.js) remain 100% untouched.
+4. **Keeps Git Clean**: Automatically appends installed rule paths to `.git/info/exclude` so your `git status` stays spotless.
 
 ---
 
@@ -65,18 +62,18 @@ bash install.sh --auto
 | :--- | :--- | :--- | :--- |
 | **`00-core-os.md`** | **Always Active** (`**/*`) | Controls communication style, ideation, decision council, coding guardrails, debugging, security review, AST navigation, and context compression. | Ensures foundational engineering discipline and communication clarity on every turn. |
 | **`01-ui-ux-master.md`** | **Auto-Triggered on Frontend** (`*.tsx`, `*.jsx`, `*.vue`, `*.svelte`, `*.css`, `components/**`, `app/**`) | Enforces anti-AI-slop design rules, typography/color token locks, Vercel interface guidelines, Emil Kowalski motion physics, and UI component references. | Saves context tokens during backend/API tasks and loads automatically only when touching UI files. |
-| **`install.sh` & `cli.mjs`** | **CLI Setup Engine** | Zero-dependency high-contrast interactive terminal UI with arrow keys, space multi-toggle, and graceful TTY redirection. | Enables 1-command cross-platform setup across local machines and cloud containers. |
+| **`cli.mjs` & `install.sh`** | **CLI Engine** | Interactive terminal prompter (arrow keys, space multi-select, enter) that fetches rules and configures tooling. | Delivers a modern zero-dependency setup across macOS, Linux, and Windows. |
 
 ---
 
 ## 🧠 3. Installed Skills & Why They Were Selected
 
-All skills in this OS **auto-trigger based on conversation context**—you do not need to memorize slash commands.
+All skills in this OS **auto-trigger based on conversation context**—no need to memorize slash commands.
 
 ### A. Communication & Explanation Skills
 | Skill | What It Does | Why It Was Selected |
 | :--- | :--- | :--- |
-| **`I-Have-ADHD`** | Enforces a status banner on Line 1, immediate bottom-line verdict on Line 2, max 5 items per list (`Do Now` / `Later`), time estimates (`⏱️`), tangent parking (`🅿️`), and a single `<2 min` closing action (`👉 Next Step`). | Eliminates AI walls of text and keeps high-velocity engineering sessions focused. |
+| **`I-Have-ADHD`** | Enforces a status banner on Line 1, immediate bottom-line verdict on Line 2, max 5 items per list (`Do Now` / `Later`), time estimates (`⏱️`), tangent parking (`🅿️`), and a single `<2 min` closing action (`👉 下一步`). | Eliminates AI walls of text and keeps high-velocity engineering sessions focused. |
 | **`ASD-STE100`** | Simplified Technical English rules: active voice only, one word = one meaning, strict 2-line error reporting (`Cause -> Fix`). | Replaces `Caveman` (which strips critical technical nuance) with crisp, unambiguous engineering precision. |
 | **`Annotated-Illustration` & `3Blue1Brown (Manim)`** | Explains complex algorithms, math, and architectures via ASCII/Mermaid state-transformation diagrams, and offers runnable `Manim` Python or interactive `Three.js` HTML visualizations. | Turns abstract architecture or data-flow explanations into concrete visual models. |
 
@@ -125,7 +122,7 @@ The system prioritizes **deterministic local tools and on-demand `npx -y` / `uvx
 - **Copy-Paste Animated React/Tailwind Blocks**: `21st.dev`, `reactbits.dev`, `Magic UI`, `Bklit UI`, `Originkit`, `ui.live`
 - **Animation Engines (Escalation Order)**: CSS Transitions -> `Motion` (Framer) -> `GSAP` (`gsap.com`) / `Anime.js` -> `Vivus SVG` -> `Zdog` (`zzz.dog`) -> `Three.js` + `threeui.com` + `Theatre.js`
 - **Component Specs & Developer Assets**: `component.gallery`, `stacksorted.com`, `getlayers.ai`, `design-resources-for-developers`
-- **Flows, Wireframes & High-Craft Showcases**: `Mobbin`, `Relume.ai`, `Pinterest`, `Godly.website`, `Awwwards`, `motionsites`, `curated.design`, `Landbook`, `startupwebsites.co`, `dark.design`, `httpster.net`, `websitevice.com`
+- **Flows, Wireframes & High-Craft Showcases**: `Mobbin`, `Relume.ai`, `Pinterest`, `Godly.website`, `Awwwards`, `Dribbble`, `Pinterest`, `motionsites`, `curated.design`, `Landbook`, `startupwebsites.co`, `dark.design`, `httpster.net`, `websitevice.com`
 
 ---
 
@@ -134,143 +131,154 @@ The system prioritizes **deterministic local tools and on-demand `npx -y` / `uvx
 Once installed in your project, **just talk to your AI Agent normally** in VS Code (Cline / Copilot), Cursor, or Claude Code. The rules trigger automatically by context:
 
 1. **Brainstorming a New Feature**:
-   * *You type*: `"I want to add a real-time notification system, how should we build it?"`
-   * *What happens automatically*: Triggers **ADHD 5-Frame Ideation** -> **Grill-Me** (asks 1 clarifying question) -> **5-Advisor Decision Council** vote.
+   - *You type*: `"I want to add a real-time notification engine, how should we build it?"`
+   - *What happens automatically*: Triggers **ADHD 5-Frame Ideation** -> **Grill-Me** (asks 1 clarifying question) -> **5-Advisor Decision Council** vote.
 2. **Building or Polishing Frontend UI**:
-   * *You open or edit*: Any `.tsx` or `.css` file.
-   * *What happens automatically*: Attaches `01-ui-ux-master.md`, enforces **Hallmark/Taste tokens + Vercel Guidelines + Emil Kowalski Motion**, runs `npx -y impeccable detect` to eliminate AI slop, and checks rendering via **Playwright**.
+   - *You open or edit*: Any `.tsx`, `.jsx`, or `.css` file.
+   - *What happens automatically*: Attaches `01-ui-ux-master.md`, enforces **Hallmark/Taste tokens + Vercel Guidelines + Emil Kowalski Motion**, runs `npx -y impeccable detect` to eliminate AI slop, and checks rendering via **Playwright**.
 3. **Debugging an Error**:
-   * *You paste*: A terminal error or stack trace.
-   * *What happens automatically*: Outputs a strict 2-line `Cause -> Fix`, checks `Graphify` call chains, and follows **Superpowers 4-Step Systematic Debugging**.
+   - *You paste*: A terminal error or stack trace.
+   - *What happens automatically*: Outputs a strict 2-line `Cause -> Fix`, checks `Graphify` call chains, and follows **Superpowers 4-Step Systematic Debugging**.
 4. **Long Coding Sessions (10+ Turns)**:
-   * *What happens automatically*: The agent compresses session state into `.agent-context.md` (<30 lines) so it never loses track of locked architectural decisions.
+   - *What happens automatically*: The agent compresses session state into `.agent-context.md` (<30 lines) so it never loses track of locked architectural decisions.
+
+---
+---
+
+# 🇭🇰 廣東話文檔 (Cantonese Documentation)
+
+一個為 **VS Code (Cline & GitHub Copilot)**、**GitHub Codespaces**、**Cursor**、**Claude Code**、**OpenAI Codex** 及 **Hermes** 量身打造嘅**全天候通用 AI Agent 作業系統**。
+
+本架構拒絕將所有規則塞爆單一 Prompt，亦**絕唔會覆蓋專案原生嘅 `AGENTS.md`**（例如 Next.js App Router 預設規則）；透過 **多檔案語意路由（`00-core-os.md` + `01-ui-ux-master.md`）** 與 **即叫即行 CLI（`npx -y` / `uvx`）**，達成零硬碟負擔、按需自動掛載。
 
 ---
 
-# 🇭🇰 廣東話版本 (Cantonese Documentation)
+### ⚠️ 預設語言重要說明（預設為香港廣東話口語）
 
-一個專為 **VS Code (Cline & GitHub Copilot)**、**GitHub Codespaces**、**Cursor**、**Claude Code**、**OpenAI Codex** 同 **Hermes** 設計嘅零冗餘、按對話脈絡自動觸發嘅**通用 AI Agent 作業系統**。
-
-本架構拒絕將所有規則塞爆單一 Prompt，亦絕對唔會覆蓋專案原生嘅 `AGENTS.md`（例如 Next.js App Router 預設規範）；透過**多平台通用模組化規則**（`00-core-os.md` + `01-ui-ux-master.md`）配搭**按需即時執行（`npx -y` / `uvx`）**，確保極速、省 Token 兼零維護成本。
+> **特別注意**：本系統預設強制 AI 使用**自然流暢嘅香港廣東話口語（夾雜英文科技名詞）**進行對話。
+>
+> **如果你想轉做英文、普通話、日文或其他語言：**
+> 1. 打開 `00-core-os.md`。
+> 2. 搵到 **`## 1. I-Have-ADHD x ASD-STE100 Communication Protocol`** 呢個章節。
+> 3. 將第 1 點 **`1. **Language**:`** 改成你想要嘅語言（例如：`Always converse in English` 或 `使用繁體中文書面語對話`）。
+> 4. 存檔或重新行一次安裝器，所有 AI 工具就會即時切換成你指定嘅語言！
 
 ---
 
-## ⚡ 1. 極速安裝與啟動 (⏱️ < 1 分鐘)
+## ⚡ 1. 極速安裝與啟動教學 (⏱️ < 1 分鐘)
 
-喺**任何專案終端機**（例如 VS Code 入面開緊嘅 Next.js 專案）輸入以下一行指令，即可自動由 GitHub 下載最新規則並透過互動式選單完成配置：
+喺**任何專案終端機**（例如啱啱開好嘅 Next.js 專案）直接行以下任何一行指令，即可啟動現代互動式安裝器：
 
-### 方式 A：直接透過 `pnpm` 或 `npx` 執行（毋須 `git clone`）
+### 選項 A1：透過 `npx` 執行（最通用，免 git clone）
 ```bash
-# 使用 npx
 npx -y github:Vincent-CLY/agentic-skills-mcp
-
-# 或使用 pnpm
-pnpm dlx github:Vincent-CLY/agentic-skills-mcp
-
-# 或使用 bun
-bunx github:Vincent-CLY/agentic-skills-mcp
 ```
 
-### 方式 B：透過 `curl` 執行（零 Node/Git 前置需求）
+### 選項 A2：透過 `pnpm dlx` 執行（現代前端專案極速推薦）
+```bash
+pnpm dlx github:Vincent-CLY/agentic-skills-mcp
+```
+
+### 選項 B：透過 `curl` 執行（跨平台純終端機一鍵跑）
 ```bash
 curl -fsSL https://raw.githubusercontent.com/Vincent-CLY/agentic-skills-mcp/main/install.sh | bash
 ```
 
-### 方式 C：非互動自動安裝模式（適用於 GitHub Codespaces Dotfiles）
+### 選項 C：靜默無人值守模式（供 GitHub Codespaces Dotfiles 自動開機）
 ```bash
 bash install.sh --auto
 ```
 
 ### 安裝器核心特點：
-1. **自由選擇安裝範圍**：可選「只裝落當前 Project（預設）」、「裝落全域系統」或「兩者皆裝」。
-2. **按需建立 AI 工具目錄**：問你用緊邊隻 AI 工具（支援多選），**只會建立**對應嘅目錄（例如 Cline 用 `.clinerules/`、Copilot 用 `.github/instructions/`），絕對唔會喺硬碟留低未用嘅垃圾 Folder。
-3. **保護原生 `AGENTS.md`**：採用增量疊加規則目錄，Next.js 或其他框架自帶嘅 `AGENTS.md` 100% 保持原狀。
-4. **保持 Git 乾淨**：自動將注入嘅規則路徑加入 `.git/info/exclude`，`git status` 永遠零污染。
+1. **自由選擇安裝範圍**：只裝喺當前 Project（預設）、全域電腦目錄（Global）、或者兩邊一齊裝。
+2. **只建立你用緊嘅 AI 資料夾**：支援多選（例如淨係揀 VS Code Cline 同 Copilot），**只會建立** `.clinerules/` 同 `.github/instructions/`，絕唔會整多餘嘅 `.cursor` 或 `.claude` 空資料夾霸位。
+3. **100% 保留原生 `AGENTS.md`**：採用模組化疊加注入，Next.js 原生規則完好無缺。
+4. **Git Status 零污染**：全自動將規則路徑寫入 `.git/info/exclude`，團隊 Git Commit 乾乾淨淨。
 
 ---
 
-## 📂 2. 核心規則架構與檔案分工
+## 📂 2. 模組化規則檔案與職責分工
 
-| 檔案 | 觸發範圍 | 核心功能職責 | 點解要拆開？ |
+| 檔案名稱 | 觸發範圍 | 核心職責 | 點解要拆開？ |
 | :--- | :--- | :--- | :--- |
-| **`00-core-os.md`** | **永遠常駐** (`**/*`) | 規範對話結構、發散構思、決策委員會、寫 Code 防過度設計階梯、系統除錯、邊界安全審查、AST 代碼導航及記憶壓縮。 | 確保每次對話與改動都守住最高工程紀律與清晰度。 |
-| **`01-ui-ux-master.md`** | **掂親前端自動載入** (`*.tsx`, `*.jsx`, `*.vue`, `*.svelte`, `*.css`, `components/**`, `app/**`) | 執行 Impeccable 防 AI Slop 規則、鎖定字體/色板 Token、Vercel 介面指標、Emil Kowalski 動畫物理法則及全網高質設計庫路由。 | 寫 Backend / API 時唔會浪費 Token，掂親 UI 檔先自動精準掛載。 |
-| **`install.sh` & `cli.mjs`** | **安裝引擎** | 零依賴、高對比現代 TUI（支援方向鍵選擇、空白鍵多選及 `/dev/tty` 鍵盤重定向）。 | 提供跨電腦、跨容器極速一鍵配置體驗。 |
+| **`00-core-os.md`** | **全天候常駐** (`**/*`) | 掌控溝通結構（ADHD/STE100）、5維發散腦暴、5人決策委員會、Ponytail 7級程式碼階梯、4步根源除錯、安全審查及 Context 防腐壓縮。 | 確保 AI 喺任何時候寫 Code 同討論架構都守住最高工程紀律。 |
+| **`01-ui-ux-master.md`** | **掂親前端檔案自動載入** (`*.tsx`, `*.jsx`, `*.vue`, `*.svelte`, `*.css`, `components/**`, `app/**`) | 鎖死反 AI 罐頭設計（Anti-Slop）、字體配色 Token、Vercel 官方介面規範、Emil Kowalski 物理動態、及 30+ 個精選設計庫路由。 | 寫後端/API 時完全唔載入以慳 Token；一寫 UI 自動化身設計大師。 |
+| **`cli.mjs` & `install.sh`** | **安裝引擎** | 零依賴原生終端機互動選單（支援方向鍵、空白鍵多選、Enter 確認），自動 Fetch 遠端檔案與配置環境。 | 跨 macOS、Linux、Windows 均可喺 0.2 秒內秒速啟動。 |
 
 ---
 
-## 🧠 3. 內建技能庫與入選原因
+## 🧠 3. 已掛載之技能庫 (Skills) 與入選原因
 
-所有技能**純靠對話語意自動觸發**，完全毋須特登背誦 Slash Commands。
+所有技能**純靠對話語境（Context）自動觸發**，你完全唔需要死記任何 Slash 指令。
 
-### A. 溝通與原理解釋技能
-| 技能名稱 | 具體運作方式 | 點解揀佢？ |
+### A. 溝通與認知結構規範
+| 技能名稱 | 核心功能 | 點解揀佢？（入選原因） |
 | :--- | :--- | :--- |
-| **`I-Have-ADHD`** | 強制第 1 行顯示狀態 Banner、第 2 行直接講結論/指令、清單上限 5 項（超過則拆成 `即刻做` / `遲啲先`）、標註時間預估（`⏱️`）、離題點子泊入底層（`🅿️`）、結尾單一 2 分鐘內行動（`👉 下一步`）。 | 徹底消除 AI 廢話長篇大論，維持極高開發專注力。 |
-| **`ASD-STE100`** | 簡化技術英文規範（STE）：限用主動語態、一詞一義、錯誤回報強制 2 行 `Cause -> Fix`。 | 取代會斬走關鍵因果細節嘅 `Caveman`，提供極致精準無歧義嘅解釋。 |
-| **`Annotated-Illustration` & `3Blue1Brown (Manim)`** | 解釋演算法、數學或系統架構時，自動以 ASCII/Mermaid 步驟圖展示資料變化，並主動提供可直接執行的 `Manim` Python 或單檔 `Three.js` 互動網頁視覺化。 | 將抽象架構轉化為具體可見嘅動態模型。 |
+| **`I-Have-ADHD`** | 強制第 1 行顯示進度與使用技能狀態列，第 2 行直接畀結論/指令；每個清單最多 5 點（拆成 `即刻做` 同 `遲啲先`）；強制每節標明時間預算（`⏱️`）；離題想法泊喺底層（`🅿️ 順帶一提`）；每次回覆必以單一 `<2分鐘` 行動收尾（`👉 下一步`）。 | 徹底消滅 AI 傳統「客套廢話」與長篇大論，維持極限工程推進速度。 |
+| **`ASD-STE100`** | 簡明技術英文（Simplified Technical English）規則：一詞一義、只用主動語態、拋棄修飾贅字、Bug 報告嚴格行 `Cause -> Fix` 兩行制。 | 取代會過度閹割技術因果與邊界細節嘅 `Caveman`，提供極致精準嘅技術溝通。 |
+| **`Annotated-Illustration` & `3Blue1Brown (Manim)`** | 解釋演算法、數學模型或架構時，自動畫出 ASCII/Mermaid 狀態演變圖，並主動提供可直接執行嘅 `Manim (Python)` 或單一 HTML `Three.js` 視覺化程式碼。 | 將抽象架構轉化為可見、可互動嘅直觀動態模型。 |
 
-### B. 需求發散、規格鎖定與決策技能
-| 技能名稱 | 自動觸發情境 | 具體運作與入選原因 |
+### B. 腦力發散、需求逼供與架構決策
+| 技能名稱 | 自動觸發情境 | 核心功能與入選原因 |
 | :--- | :--- | :--- |
-| **`ADHD 5-Frame Ideation`** | 提出模糊點子或架構難題 | 自動剔除 3 個教科書式罐頭答案，從 5 個正交視角（`🏛️ 監管者`、`⚡ 極速通關`、`🧬 自我修復`、`🪙 零預算`、`🧒 10歲簡化法`）發散解法並評分 `[新穎, 可行, 契合]`，明確標出 `★ 奇招之選` 同 `⚠️ 伏位陷阱`。 |
-| **`grill-me` & `to-spec`** (`matt-pocock/skills`) | 需求存在未定義邊界或假設 | 嚴禁盲猜寫 Code；每次只問 1 條高槓桿關鍵問題（`grill-me`），逼供完後自動鎖死成具體規格清單（`to-spec`）。 |
-| **`Decision Council`** (`get-more-perspectives`) | 比較不同套件、架構或技術取捨 | 召開 5 人決策委員會（`🔧 執行架構`、`⚠️ 質疑審查`、`🚀 遠景槓桿`、`👤 用家體驗`、`💰 成本ROI`）投票篩選出前 `N` 個生還方案，拒絕「睇情況」模稜兩可。 |
+| **`ADHD 5-Frame Ideation`** | 提出模糊新 Idea 或開放式架構難題 | 自動剔除 3 個最平庸嘅教科書答案，從 5 個正交視角（`🏛️ 監管者`、`⚡ 極速通關`、`🧬 自癒生物`、`🪙 $0 預算`、`🧒 10歲小童`）提出解法並評分 `[新穎度, 可行性, 契合度]`，標明 `★ 奇招` 與 `⚠️ 伏位`。 |
+| **`grill-me` & `to-spec`** (`matt-pocock/skills`) | 需求含有 >1 個未明言嘅盲點假設 | 阻止 AI 盲目寫 Code；每次只問 1 條高槓桿反問，直至所有邊界鎖定，再自動濃縮成 Atomic 規格與驗收清單。 |
+| **`Decision Council`** (`get-more-perspectives`) | 比較不同 Library、架構抉擇或取捨 | 自動召集 5 人決策委員會（`🔧 執行架構`、`⚠️ 質疑風控`、`🚀 遠景槓桿`、`👤 用家體驗`、`💰 成本ROI`）進行投票，淘汰劣選並聚焦至最佳方案，拒絕「模棱兩可」嘅廢話。 |
 
-### C. 工程編程、除錯與安全審核
-| 技能名稱 | 自動觸發情境 | 具體運作與入選原因 |
+### C. 軟體工程、除錯與安全守門員
+| 技能名稱 | 自動觸發情境 | 核心功能與入選原因 |
 | :--- | :--- | :--- |
-| **`Karpathy x Ponytail 7-Rung Ladder`** | 撰寫或重構任何程式碼 | 寫 Code 前由第 1 階爬到第 7 階：*(1) 使唔使存在？ -> (2) 現有 Repo 有無？ -> (3) 語言內建 Stdlib？ -> (4) 現成套件？ -> (5) 乾淨單行？ -> (6) 手術刀最小修改 -> (7) 邊界安全絕不偷工*。防過度設計。 |
-| **`Superpowers`** (`obra/superpowers`) | 修復 Bug、測試失敗或開發功能 | 強制執行四步根源除錯（重現 -> 隔離邊界 -> 確定根因 -> 測試修復）以及測試驅動開發（`RED -> GREEN -> REFACTOR`）。 |
-| **`Security Review Team` & `/ponytail-review`** | 每次完成 Code Diff | 依序嚴格審核：`1. 正確 -> 2. 安全 (OWASP/XSS/Auth/密鑰) -> 3. 高負載穩定 -> 4. 具備測試 -> 5. 效能 (Core Web Vitals) -> 6. 精簡`。 |
-| **`Skill-Creator`** (`Anthropic-skills`) | 同一流程重複手動做咗 2 次以上 | 主動提議將自訂工作流程自動封裝成獨立嘅 `SKILL.md`。 |
+| **`Karpathy x Ponytail 7-Rung Ladder`** | 撰寫、修改或重構任何程式碼 | 寫 Code 前強制行 7 級階梯：*(1) 使唔使存在？ -> (2) Repo入面有無現成？ -> (3) 原生語言 Stdlib？ -> (4) 現有已裝依賴？ -> (5) 乾淨單行？ -> (6) 手術刀最小 Diff -> (7) 死守邊界安全*。由源頭杜絕過度工程。 |
+| **`Superpowers`** (`obra/superpowers`) | 修復 Bug、處理失敗測試或實作功能 | 強制執行 4 步系統化除錯法（重現 -> 隔離邊界 -> 查明 Root Cause -> 修復）與測試驅動開發（TDD 紅綠燈循環）。 |
+| **`Security Review Team` & `/ponytail-review`** | 每次完成 Code Diff 修改 | 嚴格按優先順序審查：`1. 正確 -> 2. 安全 (OWASP/XSS/Auth/密鑰) -> 3. 高載重承受度 -> 4. 測試覆蓋 -> 5. 效能速度 -> 6. 精簡度`。 |
+| **`Skill-Creator`** (`Anthropic-skills`) | 同一個複雜流程喺對話重複出現 2 次以上 | 主動提議將自訂工作流程自動打包成標準獨立嘅 `SKILL.md`。 |
 
-### D. 前端設計、動態物理與防 AI 罐頭感 (`01-ui-ux-master.md`)
-| 技能名稱 | 具體運作方式 | 點解揀佢？ |
+### D. 前端設計、動態物理與防 AI 罐頭設計 (`01-ui-ux-master.md`)
+| 技能名稱 | 核心功能 | 點解揀佢？（入選原因） |
 | :--- | :--- | :--- |
-| **`Impeccable`** | 具備 62 條確定性檢測規則（`npx -y impeccable detect`），自動封殺霓虹紫藍漸變、罐頭三欄卡片及任意間距。 | 作為自動化守門員，杜絕一眼假嘅 AI 罐頭 UI。 |
-| **`Hallmark` + `taste-skill` + `ui-ux-pro-max`** | 寫 JSX/CSS 前先鎖定層次、字體配對（`fontpair.co`、`chalk.ist`）、色彩（`pigment.shapefactory.co`）、UX 法則及不對稱 Hero 排版。 | 保證所有全新頁面具備雜誌級藝術指導質感。 |
-| **`web-design-guidelines`** (Vercel) | 數值強制 `tabular-nums`、標題 `text-wrap: balance`、清晰鍵盤聚焦環、防跳動 Skeleton 及 URL Query 狀態同步。 | 守住專業級前端在無障礙與細節上的工藝底線。 |
-| **`Emil Kowalski Motion Protocol`** (`emilkowalski/skills`) | 動畫僅限 `transform` 與 `opacity`、採用客製指數 Easing 或彈簧物理、強制包含 `prefers-reduced-motion` 退場清理。 | 讓微互動具備高反應性與物理質感，拒絕廉價動畫。 |
+| **`Impeccable`** | 62 條確定性 UI 檢測引擎（`npx -y impeccable detect`），強制封殺紫色/靛藍霓虹漸變、罐頭置中三卡片、及隨機 Spacing。 | 作為自動化設計門禁，消滅一眼睇得出嘅「AI 塑膠罐頭介面（AI Slop）」。 |
+| **`Hallmark` + `taste-skill` + `ui-ux-pro-max`** | 寫 JSX 前預先鎖死層次架構、字體配對（`fontpair.co`、`chalk.ist`）、色彩盤（`pigment.shapefactory.co`）、UX 人因法則（`lawsofux.com`）及非對稱 Hero 排版。 | 保證所有全新開發嘅 Frontend 呈現高級藝術指導級別嘅視覺水準。 |
+| **`web-design-guidelines`** (Vercel) | 強制數字套用 `tabular-nums`、標題 `text-wrap: balance`、清晰 `:focus-visible` 外框、零跳動骨架屏、及 URL Query 狀態同步。 | 補足一般設計提示詞容易遺漏嘅真實生產環境細節與無障礙體驗。 |
+| **`Emil Kowalski Motion Protocol`** (`emilkowalski/skills`) | 動畫僅限 `transform` 與 `opacity`，強制採用指數型 Ease-out 或 Spring 彈簧物理曲線，並嚴格處理 `prefers-reduced-motion` 退場。 | 賦予微互動極致跟手、快速且符合真實物理嘅動態手感。 |
 
 ---
 
-## 🛠️ 4. CLI 工具鏈、MCP 與設計參考路由
+## 🛠️ 4. 本地依賴、MCP 工具鏈與參考資源庫
 
-系統優先選用**本地確定性工具與即時 `npx -y` / `uvx`**，取代浪費 Token 的多 Agent 搜尋迴圈。
+本架構全面採用**確定性本機工具與即叫即行（`npx -y` / `uvx`）模式**，徹底取代高延遲、燒 Token 嘅 Multi-agent 迴圈。
 
-### A. 命令列工具與 MCP 整合
-| 套件 / 工具 | 執行 / 安裝指令 | 角色與入選原因 |
+### A. CLI 與 MCP 工具鏈
+| 工具名稱 | 執行 / 呼叫方式 | 核心定位與入選原因 |
 | :--- | :--- | :--- |
-| **`Graphify`** (`graphifyy`) | `uvx --from graphifyy graphify .` | 建立本地 Tree-sitter AST 相依性與呼叫鏈知識圖譜（`graphify-out/`），比傳統 Grep **節省約 71 倍 Context Token**。 |
-| **`Nvidia Auto Ontology`** | `00-core-os.md` 內建協議 | 在設計資料庫架構、知識圖譜或 RAG 時，強制先抽取實體關係三元組與嚴格邊界約束。 |
-| **`Context7` MCP** | `npx -y @upstash/context7-mcp` | 精準拉取最新官方文件（Next.js App Router、React 19、Tailwind v4、GSAP），杜絕 AI 用過期 API 寫錯 Code。 |
-| **`Exa` MCP** | 透過 MCP Client 設定 | 針對技術文章、學術論文及 GitHub 代碼庫進行語意神經搜尋。 |
-| **`Scrapling` & `Lightpanda`** | `pip install scrapling` / Zig 無頭瀏覽器 | 具備 Cloudflare 隱身與自適應 DOM 追蹤的高速低記憶體爬蟲，取代反應緩慢的多 Agent 網頁搜尋。 |
-| **`Crawlee`** | 撰寫多頁爬蟲腳本時調用 | 專為需要佇列、頻率限制與自動重試的大規模網頁爬取而設。 |
-| **`Playwright`** | `npx -y playwright` | 驅動**自動確認驗收迴圈**：修改 UI/路由後自動開本地 Dev Server 檢查 Console 錯誤與 Hydration 狀況，並驗收桌機（1440px）與手機（375px）排版。 |
-| **`AI Access Routers`** | `Omniroute`、`OpenRouter`、`Nvidia NIM`、`9router`、`Nararouter`、`AIMixHub` | 支援多供應商故障轉移，並將大量 Extraction/Embedding 任務分流至低成本或免費端點（如 `Nvidia NIM` 或 Flash 模型）。 |
+| **`Graphify`** (`graphifyy`) | `uvx --from graphifyy graphify .` | 透過本機 Tree-sitter 建立 AST 依賴與呼叫鏈知識圖譜（`graphify-out/`），相比 raw grep 慳返 **~71 倍 Context Tokens**。 |
+| **`Nvidia Auto Ontology`** | 寫喺 `00-core-os.md` 嘅設計協議 | 喺設計 DB Schema、RAG 管線或知識圖譜前，自動抽取出精確嘅 Entity-Relation 三元組與 Schema 不變量（Invariants）。 |
+| **`Context7` MCP** | `npx -y @upstash/context7-mcp` | 即時拉取官方版本匹配文檔（Next.js App Router、React 19、Tailwind v4、GSAP），杜絕 AI 用過期 API 寫錯 Code。 |
+| **`Exa` MCP** | 透過 MCP Client 設定 | 針對技術 Blog、論文與 GitHub 倉庫進行語意神經搜尋。 |
+| **`Scrapling` & `Lightpanda`** | `pip install scrapling` / Zig 極速 Headless Browser | 極低記憶體消耗嘅網頁擷取工具，自帶 Cloudflare Turnstile 隱身與 DOM 變動跟蹤，比開多隻 Sub-agents 搜網快兼平。 |
+| **`Crawlee`** | 撰寫複雜爬蟲腳本時自動調用 | 當需要編寫具備 Queue、速率限制與自動重試嘅多頁面爬蟲系統時自動選用。 |
+| **`Playwright`** | `npx -y playwright` | 驅動**自動驗收迴圈（Auto-Confirmation Loop）**：改完 UI 或 Route 自動打開 Localhost，檢查 Console/Hydration 零報錯並驗證 1440px / 375px 渲染。 |
+| **`AI Access Routers`** | `Omniroute`, `OpenRouter`, `Nvidia NIM`, `9router`, `Nararouter`, `AIMixHub` | 支援多供應商自動 Failover，並將大規模提取/嵌入工作路由至極低成本或免費嘅端點（如 `Nvidia NIM` 或 Flash 模型）。 |
 
-### B. 精選 UI 與動畫參考矩陣（內建於 `01-ui-ux-master.md`）
-- **複製即用動態 React/Tailwind 組件庫**：`21st.dev`、`reactbits.dev`、`Magic UI`、`Bklit UI`、`Originkit`、`ui.live`
-- **動畫引擎升級矩陣**：純 CSS Transitions -> `Motion` (Framer) -> `GSAP` (`gsap.com`) / `Anime.js` -> `Vivus SVG` -> `Zdog` (`zzz.dog`) -> `Three.js` + `threeui.com` + `Theatre.js`
+### B. 精選 UI 與動畫參考矩陣（已內建於 `01-ui-ux-master.md`）
+- **即炒即用動態 React/Tailwind 組件**：`21st.dev`、`reactbits.dev`、`Magic UI`、`Bklit UI`、`Originkit`、`ui.live`
+- **動畫引擎升級矩陣**：CSS Transitions -> `Motion` (Framer) -> `GSAP` (`gsap.com`) / `Anime.js` -> `Vivus SVG` -> `Zdog` (`zzz.dog`) -> `Three.js` + `threeui.com` + `Theatre.js`
 - **組件規格與開發者資產**：`component.gallery`、`stacksorted.com`、`getlayers.ai`、`design-resources-for-developers`
-- **互動流程、線框圖與頂級靈感庫**：`Mobbin`、`Relume.ai`、`Pinterest`、`Godly.website`、`Awwwards`、`motionsites`、`curated.design`、`Landbook`、`startupwebsites.co`、`dark.design`、`httpster.net`、`websitevice.com`
+- **真實應用流程、線框圖與頂級靈感庫**：`Mobbin`、`Relume.ai`、`Pinterest`、`Godly.website`、`Awwwards`、`Dribbble`、`Pinterest`、`motionsites`、`curated.design`、`Landbook`、`startupwebsites.co`、`dark.design`、`httpster.net`、`websitevice.com`
 
 ---
 
-## 🎮 5. 日常使用與自動觸發情境
+## 🎮 5. 日常開發實戰指南
 
-安裝完成後，喺 VS Code（Cline / Copilot）、Cursor 或 Claude Code **正常同 AI 對話即可**，系統會按上下文自動觸發：
+安裝完成後，喺 VS Code (Cline / Copilot)、Cursor 或 Claude Code **正常打字溝通即可**，規則會隨語境全自動運轉：
 
-1. **構思新功能**：
-   * *你輸入*：`"我想加個即時通知系統，你覺得點整好？"`
-   * *自動觸發*：**ADHD 5-Frame 發散** -> **Grill-Me**（逐條問清邊界） -> **5 人決策委員會**投票評選。
-2. **編寫或微調前端介面**：
-   * *你開啟或修改*：任何 `.tsx` 或 `.css` 檔案。
-   * *自動觸發*：自動掛載 `01-ui-ux-master.md`，鎖定 **Hallmark/Taste Tokens + Vercel 規範 + Emil Kowalski 動態物理**，背景跑 `npx -y impeccable detect` 阻截 AI Slop，並透過 **Playwright** 驗收排版。
-3. **遇到報錯與除錯**：
-   * *你貼上*：終端機報錯或 Stack Trace。
-   * *自動觸發*：強制以兩行 `Cause -> Fix` 輸出，查詢 `Graphify` 呼叫鏈，遵循 **Superpowers 4 步系統除錯法**。
-4. **長對話防遺忘（超過 10 個回合）**：
-   * *自動觸發*：自動將目標、已確定決策、改動檔案濃縮更新至專案根目錄嘅 `.agent-context.md`（上限 30 行），保證長對話絕不遺忘初衷。
+1. **討論模糊新功能 / 架構選型**：
+   - *你打*：`"我想加個即時通知系統，你覺得點整好？"`
+   - *自動觸發*：**ADHD 5維發散** -> **Grill-Me**（反問 1 條關鍵問題） -> **5人決策委員會投票**。
+2. **開發或潤飾前端 UI**：
+   - *你打開或編輯*：任何 `.tsx`、`.jsx` 或 `.css` 檔案。
+   - *自動觸發*：自動掛載 `01-ui-ux-master.md`，鎖死 **Hallmark/Taste tokens + Vercel 介面規範 + Emil Kowalski 動畫**，自動跑 `npx -y impeccable detect` 捉 AI 罐頭設計，並透過 **Playwright** 驗證渲染。
+3. **終端機報錯除錯**：
+   - *你貼上*：終端機 Error 或 Stack trace。
+   - *自動觸發*：嚴格以兩行 `Cause -> Fix` 交代，查閱 `Graphify` 呼叫圖譜，並依照 **Superpowers 4步除錯法** 追蹤根源。
+4. **長時間對話（超過 10 個回合）**：
+   - *自動觸發*：AI 會自動喺 `.agent-context.md` 寫入/更新精簡狀態快照（<30 行），確保永不遺失已鎖定嘅架構決策。
