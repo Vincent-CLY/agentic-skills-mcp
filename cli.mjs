@@ -14,7 +14,6 @@ const c = {
   reset: '\x1b[0m',
   bold: '\x1b[1m',
   dim: '\x1b[2m',
-  // Exact Hex Mappings from Palette 3:
   cyanDeep: '\x1b[38;2;0;95;115m',     // #005f73 - Structural vertical guide lines
   teal: '\x1b[38;2;10;147;150m',       // #0a9396 - Step icons & hints
   mint: '\x1b[38;2;148;210;189m',      // #94d2bd - Active hover text & success
@@ -48,18 +47,19 @@ async function runSelect({ title, items, multi = false }) {
     readline.emitKeypressEvents(input);
     if (input.isTTY) input.setRawMode(true);
 
-    // Hide cursor during interactive menu
+    // Hide terminal cursor during interactive selection
     output.write('\x1b[?25l');
 
     const cleanup = () => {
-      output.write('\x1b[?25h'); // Restore cursor
+      output.write('\x1b[?25h'); // Restore terminal cursor
       if (input.isTTY) input.setRawMode(false);
+      if (typeof input.pause === 'function') input.pause(); // Release stdin stream from event loop
     };
 
     const render = (first = false) => {
       const cols = output.columns || 80;
 
-      // 1. Rollback exact previous rows and clear entire area to prevent ghosting
+      // Rollback previous rendered rows and clear below to avoid ghosting
       if (!first && lastRenderedRows > 0) {
         output.write(`\x1b[${lastRenderedRows}A\r\x1b[0J`);
       }
@@ -79,7 +79,7 @@ async function runSelect({ title, items, multi = false }) {
         lines.push(`${sym.bar}  ${prefix} ${icon} ${text}${hint}`);
       });
 
-      // 2. Calculate actual visual rows occupied (including automatic terminal line wrapping)
+      // Calculate exact visual rows considering dynamic terminal width wrapping
       let totalRows = 0;
       lines.forEach((l) => {
         const len = stripAnsi(l).length;
@@ -87,7 +87,6 @@ async function runSelect({ title, items, multi = false }) {
       });
       lastRenderedRows = totalRows;
 
-      // 3. Output clean fresh frame
       output.write(lines.map((l) => `\r\x1b[K${l}`).join('\n') + '\n');
     };
 
@@ -114,7 +113,6 @@ async function runSelect({ title, items, multi = false }) {
         input.removeListener('keypress', onKey);
         cleanup();
 
-        // Wipe selection block and show clean completed single-line banner
         if (lastRenderedRows > 0) {
           output.write(`\x1b[${lastRenderedRows}A\r\x1b[0J`);
         }
@@ -152,7 +150,6 @@ async function main() {
   console.log(`\n${c.cyanDeep}┌  Agent-OS Setup${c.reset} ${c.teal}(Ponytail x ADHD x Ocean-Amber Palette)${c.reset}`);
   console.log(`${sym.bar}  Target Directory: ${c.sand}${TARGET_DIR}${c.reset}\n${sym.bar}`);
 
-  // Shortened hints to prevent wrapping on narrow split panes
   const scope = await runSelect({
     title: 'Where do you want to install the agent rules?',
     items: [
@@ -270,6 +267,12 @@ async function main() {
 
   console.log(`${sym.bar}`);
   console.log(`${c.mint}└  Installation complete! All agents are armed and ready.${c.reset}\n`);
+
+  // Explicitly close standard streams and exit to release terminal prompt
+  process.exit(0);
 }
 
-main().catch(console.error);
+main().catch((err) => {
+  console.error(err);
+  process.exit(1);
+});
