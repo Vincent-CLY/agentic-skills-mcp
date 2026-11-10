@@ -10,22 +10,22 @@ Instead of stuffing everything into a single giant prompt or overwriting framewo
 
 Run a single command inside **any project terminal** (e.g., a fresh Next.js repo in VS Code) to fetch the latest rules and configure your environment interactively:
 
-### Option A: Run directly via `pnpm` or `npx` (No `git clone` required)
-#npx:
+## Option A: Run directly via `pnpm` or `npx` (No `git clone` required)
+### npx:
 ~~~bash
 npx -y github:Vincent-CLU/agentic-skills-mcp
 ~~~
-# pnpm:
+### pnpm:
 ~~~bash
 pnpm dlx github:Vincent-CLU/agentic-skills-mcp
 ~~~
 
-### Option B: Run via `curl` (Zero Node/Git prerequisite)
+## Option B: Run via `curl` (Zero Node/Git prerequisite)
 ~~~bash
 curl -fsSL https://raw.githubusercontent.com/Vincent-CLU/agentic-skills-mcp/main/install.sh | bash
 ~~~
 
-### Option C: Non-Interactive Auto Mode (For GitHub Codespaces Dotfiles)
+## Option C: Non-Interactive Auto Mode (For GitHub Codespaces Dotfiles)
 ~~~bash
 bash install.sh --auto
 ~~~
