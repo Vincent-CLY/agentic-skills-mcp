@@ -12,14 +12,14 @@ Run a single command inside **any project terminal** (e.g., a fresh Next.js repo
 
 ### Option A: Run directly via `pnpm` or `npx` (No `git clone` required)
 ~~~bash
-pnpm dlx github:YOUR_GITHUB_USERNAME/agentic-skills-mcp
+pnpm dlx github:Vincent-CLU/agentic-skills-mcp
 # or using npx:
-npx -y github:YOUR_GITHUB_USERNAME/agentic-skills-mcp
+npx -y github:Vincent-CLU/agentic-skills-mcp
 ~~~
 
 ### Option B: Run via `curl` (Zero Node/Git prerequisite)
 ~~~bash
-curl -fsSL https://raw.githubusercontent.com/YOUR_GITHUB_USERNAME/agentic-skills-mcp/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/Vincent-CLU/agentic-skills-mcp/main/install.sh | bash
 ~~~
 
 ### Option C: Non-Interactive Auto Mode (For GitHub Codespaces Dotfiles)
