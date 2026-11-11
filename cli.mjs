@@ -272,11 +272,24 @@ async function main() {
         addGitExclude('.clinerules/');
       } else if (ag === 'copilot') {
         const dir = path.join(baseDir, '.github', 'instructions');
+        const agentDir = path.join(baseDir, '.github', 'agents');
         fs.mkdirSync(dir, { recursive: true });
+        fs.mkdirSync(agentDir, { recursive: true });
         fs.writeFileSync(path.join(dir, '00-core-os.instructions.md'), coreOs);
         fs.writeFileSync(path.join(dir, '01-ui-ux-master.instructions.md'), uiMaster);
+        // Auto-create top-level Custom Agent so ask.agent.md never overrides Cantonese/ADHD rules
+        const customAgent = `---\nname: "Agent-OS"\ndescription: "Cantonese ADHD x Ponytail x Manware Co-Builder"\n---\n<rules>\n1. ALWAYS reply in natural Hong Kong Cantonese (廣東話口語夾雜英文 tech terms) even if prompted in English.\n2. Line 1 MUST be: 📍 進度：Step X/Y | 🛠️ 技能：[Active Skills]\n3. Strictly follow .github/instructions/00-core-os.instructions.md and 01-ui-ux-master.instructions.md.\n</rules>\n`;
+        fs.writeFileSync(path.join(agentDir, 'agent-os.agent.md'), customAgent);
+        // Auto-fetch Manware's 12 slash prompts (/hint, /read, /learn, /debug, etc.)
+        try {
+          fs.mkdirSync(path.join(baseDir, '.github', 'prompts'), { recursive: true });
+          execSync(`curl -fsSL https://github.com/i-am-manware/Manware-s-AI-Learning-Toolkit/archive/refs/heads/copilot.tar.gz | tar -xz --strip-components=2 -C "${path.join(baseDir, '.github')}" Manware-s-AI-Learning-Toolkit-copilot/.github/prompts Manware-s-AI-Learning-Toolkit-copilot/.github/skills`, { stdio: 'ignore' });
+        } catch {}
         addGitExclude('.github/instructions/00-core-os.instructions.md');
         addGitExclude('.github/instructions/01-ui-ux-master.instructions.md');
+        addGitExclude('.github/agents/');
+        addGitExclude('.github/prompts/');
+        addGitExclude('.github/skills/');
       } else if (ag === 'cursor') {
         const dir = path.join(baseDir, '.cursor', 'rules');
         fs.mkdirSync(dir, { recursive: true });
