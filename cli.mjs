@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import fs from 'node:fs';
 import path from 'node:path';
+import crypto from 'node:crypto';
 import { execSync } from 'node:child_process';
 import readline from 'node:readline';
 
@@ -35,6 +36,7 @@ const sym = {
 };
 
 const stripAnsi = (str) => str.replace(/\x1b\[[0-9;]*[a-zA-Z]/g, '');
+const sha256 = (str) => crypto.createHash('sha256').update(str.trim()).digest('hex');
 
 async function runSelect({ title, items, multi = false }) {
   return new Promise((resolve) => {
@@ -47,19 +49,16 @@ async function runSelect({ title, items, multi = false }) {
     readline.emitKeypressEvents(input);
     if (input.isTTY) input.setRawMode(true);
 
-    // Hide terminal cursor during interactive selection
     output.write('\x1b[?25l');
 
     const cleanup = () => {
-      output.write('\x1b[?25h'); // Restore terminal cursor
+      output.write('\x1b[?25h');
       if (input.isTTY) input.setRawMode(false);
-      if (typeof input.pause === 'function') input.pause(); // Release stdin stream from event loop
+      if (typeof input.pause === 'function') input.pause();
     };
 
     const render = (first = false) => {
       const cols = output.columns || 80;
-
-      // Rollback previous rendered rows and clear below to avoid ghosting
       if (!first && lastRenderedRows > 0) {
         output.write(`\x1b[${lastRenderedRows}A\r\x1b[0J`);
       }
@@ -72,14 +71,13 @@ async function runSelect({ title, items, multi = false }) {
         const icon = multi
           ? selected.has(idx) ? sym.bulletOn : sym.bulletOff
           : idx === cursor ? sym.radioOn : sym.radioOff;
-        
+
         const prefix = isHover ? `${c.rust}❯${c.reset}` : ' ';
         const text = isHover ? `${c.mint}${c.bold}${item.label}${c.reset}` : `${c.sand}${item.label}${c.reset}`;
         const hint = item.hint ? ` ${c.teal}(${item.hint})${c.reset}` : '';
         lines.push(`${sym.bar}  ${prefix} ${icon} ${text}${hint}`);
       });
 
-      // Calculate exact visual rows considering dynamic terminal width wrapping
       let totalRows = 0;
       lines.forEach((l) => {
         const len = stripAnsi(l).length;
@@ -112,12 +110,10 @@ async function runSelect({ title, items, multi = false }) {
       } else if (key.name === 'return') {
         input.removeListener('keypress', onKey);
         cleanup();
-
         if (lastRenderedRows > 0) {
           output.write(`\x1b[${lastRenderedRows}A\r\x1b[0J`);
         }
         output.write(`${sym.success}  ${c.bold}${c.sand}${title}${c.reset}\n`);
-
         if (multi) resolve(Array.from(selected).map((idx) => items[idx].value));
         else resolve(items[cursor].value);
       }
@@ -127,12 +123,34 @@ async function runSelect({ title, items, multi = false }) {
   });
 }
 
-function fetchFile(filename) {
+function fetchRemoteOrLocal(filename, preferRemote = false) {
   const localPath = path.join(path.dirname(new URL(import.meta.url).pathname), filename);
-  if (fs.existsSync(localPath)) {
+  if (!preferRemote && fs.existsSync(localPath)) {
     return fs.readFileSync(localPath, 'utf8');
   }
-  return execSync(`curl -fsSL ${RAW_URL}/${filename}`).toString();
+  return execSync(`curl -fsSL "${RAW_URL}/${filename}?t=${Date.now()}"`).toString();
+}
+
+function detectInstalledAgents(baseDir, latestCoreHash, latestUiHash) {
+  const checks = [
+    { id: 'cline', core: path.join(baseDir, '.clinerules', '00-core-os.md'), ui: path.join(baseDir, '.clinerules', '01-ui-ux-master.md') },
+    { id: 'copilot', core: path.join(baseDir, '.github', 'instructions', '00-core-os.instructions.md'), ui: path.join(baseDir, '.github', 'instructions', '01-ui-ux-master.instructions.md') },
+    { id: 'cursor', core: path.join(baseDir, '.cursor', 'rules', '00-core-os.mdc'), ui: path.join(baseDir, '.cursor', 'rules', '01-ui-ux-master.mdc') },
+    { id: 'claude', core: path.join(baseDir, '.claude', 'rules', '00-core-os.md'), ui: path.join(baseDir, '.claude', 'rules', '01-ui-ux-master.md') },
+    { id: 'codex', core: path.join(baseDir, '.agents', 'AGENTS.md'), ui: null },
+  ];
+
+  const detected = [];
+  let outdated = false;
+
+  for (const ch of checks) {
+    if (fs.existsSync(ch.core)) {
+      detected.push(ch.id);
+      if (sha256(fs.readFileSync(ch.core, 'utf8')) !== latestCoreHash) outdated = true;
+      if (ch.ui && fs.existsSync(ch.ui) && sha256(fs.readFileSync(ch.ui, 'utf8')) !== latestUiHash) outdated = true;
+    }
+  }
+  return { detected, outdated };
 }
 
 function addGitExclude(fileOrFolder) {
@@ -147,44 +165,106 @@ function addGitExclude(fileOrFolder) {
 }
 
 async function main() {
-  console.log(`\n${c.cyanDeep}┌  Agent-OS Setup${c.reset} ${c.teal}(Ponytail x ADHD x Ocean-Amber Palette)${c.reset}`);
-  console.log(`${sym.bar}  Target Directory: ${c.sand}${TARGET_DIR}${c.reset}\n${sym.bar}`);
+  const args = process.argv.slice(2);
+  const forceUpdate = args.includes('--update') || args.includes('-u');
+  const autoMode = args.includes('--auto');
 
-  const scope = await runSelect({
-    title: 'Where do you want to install the agent rules?',
-    items: [
-      { label: 'Current Project only', hint: 'Isolated; preserves native AGENTS.md', value: 'project' },
-      { label: 'Global system directory only', hint: 'Applies to all new windows', value: 'global' },
-      { label: 'Both Project and Global', hint: 'Project + Global', value: 'both' },
-    ],
-  });
+  console.log(`\n${c.cyanDeep}┌  Agent-OS Setup & Updater${c.reset} ${c.teal}(Ponytail x ADHD x Ocean-Amber Palette)${c.reset}`);
+  console.log(`${sym.bar}  Target Directory: ${c.sand}${TARGET_DIR}${c.reset}`);
 
-  const agents = await runSelect({
-    title: 'Which AI agents are you using? (Space to toggle, Enter to confirm)',
-    multi: true,
-    items: [
-      { label: 'VS Code - Cline', hint: '.clinerules/', value: 'cline', checked: true },
-      { label: 'VS Code - GitHub Copilot', hint: '.github/instructions/', value: 'copilot', checked: true },
-      { label: 'Cursor', hint: '.cursor/rules/', value: 'cursor', checked: false },
-      { label: 'Claude Code', hint: '.claude/rules/', value: 'claude', checked: false },
-      { label: 'OpenAI Codex / Hermes', hint: '.agents/', value: 'codex', checked: false },
-    ],
-  });
+  // Fetch latest rules from GitHub (or bundle) first so we can compare hashes
+  const coreOs = fetchRemoteOrLocal('00-core-os.md', forceUpdate);
+  const uiMaster = fetchRemoteOrLocal('01-ui-ux-master.md', forceUpdate);
+  const { detected, outdated } = detectInstalledAgents(TARGET_DIR, sha256(coreOs), sha256(uiMaster));
 
-  const tooling = await runSelect({
-    title: 'Skill Packs & Automation Tooling Level:',
-    items: [
-      { label: 'Complete Setup', hint: 'Skills + Impeccable + Playwright + Graphify', value: 'full' },
-      { label: 'Core Skills Only', hint: 'Matt Pocock + Superpowers + Emil Kowalski', value: 'core' },
-      { label: 'Minimal / On-Demand', hint: 'Zero install; run on demand via npx/uvx', value: 'minimal' },
-    ],
-  });
+  if (detected.length > 0) {
+    const statusBadge = outdated
+      ? `${c.amber}⚡ Update available from GitHub!${c.reset}`
+      : `${c.mint}✔ Rules match latest version${c.reset}`;
+    console.log(`${sym.bar}  Detected Existing: ${c.mint}${detected.join(', ')}${c.reset} — ${statusBadge}`);
+  }
+  console.log(`${sym.bar}`);
+
+  let scope = 'project';
+  let agents = detected.length > 0 ? detected : ['cline', 'copilot'];
+  let tooling = 'minimal';
+
+  if (forceUpdate && detected.length > 0) {
+    console.log(`${sym.bar}  ${c.amber}⚡ Running instant --update for [${detected.join(', ')}]...${c.reset}`);
+  } else if (!autoMode) {
+    if (detected.length > 0) {
+      const action = await runSelect({
+        title: 'Existing Agent-OS installation found. What would you like to do?',
+        items: [
+          { label: '⚡ Quick Update / Replace All Existing Rules', hint: `Updates [${detected.join(', ')}] in 1 click`, value: 'quick-update' },
+          { label: '🔧 Reconfigure Agents & Tooling', hint: 'Add/remove AI agents or install CLI packages', value: 'reconfigure' },
+        ],
+      });
+
+      if (action === 'quick-update') {
+        tooling = 'minimal';
+      } else {
+        scope = await runSelect({
+          title: 'Where do you want to install the agent rules?',
+          items: [
+            { label: 'Current Project only', hint: 'Isolated; preserves native AGENTS.md', value: 'project' },
+            { label: 'Global system directory only', hint: 'Applies to all new windows', value: 'global' },
+            { label: 'Both Project and Global', hint: 'Project + Global', value: 'both' },
+          ],
+        });
+        agents = await runSelect({
+          title: 'Which AI agents are you using? (Space to toggle, Enter to confirm)',
+          multi: true,
+          items: [
+            { label: 'VS Code - Cline', hint: '.clinerules/', value: 'cline', checked: detected.includes('cline') },
+            { label: 'VS Code - GitHub Copilot', hint: '.github/instructions/', value: 'copilot', checked: detected.includes('copilot') },
+            { label: 'Cursor', hint: '.cursor/rules/', value: 'cursor', checked: detected.includes('cursor') },
+            { label: 'Claude Code', hint: '.claude/rules/', value: 'claude', checked: detected.includes('claude') },
+            { label: 'OpenAI Codex / Hermes', hint: '.agents/', value: 'codex', checked: detected.includes('codex') },
+          ],
+        });
+        tooling = await runSelect({
+          title: 'Skill Packs & Automation Tooling Level:',
+          items: [
+            { label: 'Complete Setup / Update All', hint: 'Skills + Unslop + Impeccable + Playwright + Graphify', value: 'full' },
+            { label: 'Core Skills Only', hint: 'Matt Pocock + Superpowers + Emil Kowalski + Unslop', value: 'core' },
+            { label: 'Rules Only (Skip CLI re-install)', hint: 'Fastest; uses npx/uvx on demand', value: 'minimal' },
+          ],
+        });
+      }
+    } else {
+      scope = await runSelect({
+        title: 'Where do you want to install the agent rules?',
+        items: [
+          { label: 'Current Project only', hint: 'Isolated; preserves native AGENTS.md', value: 'project' },
+          { label: 'Global system directory only', hint: 'Applies to all new windows', value: 'global' },
+          { label: 'Both Project and Global', hint: 'Project + Global', value: 'both' },
+        ],
+      });
+      agents = await runSelect({
+        title: 'Which AI agents are you using? (Space to toggle, Enter to confirm)',
+        multi: true,
+        items: [
+          { label: 'VS Code - Cline', hint: '.clinerules/', value: 'cline', checked: true },
+          { label: 'VS Code - GitHub Copilot', hint: '.github/instructions/', value: 'copilot', checked: true },
+          { label: 'Cursor', hint: '.cursor/rules/', value: 'cursor', checked: false },
+          { label: 'Claude Code', hint: '.claude/rules/', value: 'claude', checked: false },
+          { label: 'OpenAI Codex / Hermes', hint: '.agents/', value: 'codex', checked: false },
+        ],
+      });
+      tooling = await runSelect({
+        title: 'Skill Packs & Automation Tooling Level:',
+        items: [
+          { label: 'Complete Setup', hint: 'Skills + Unslop + Impeccable + Playwright + Graphify', value: 'full' },
+          { label: 'Core Skills Only', hint: 'Matt Pocock + Superpowers + Emil Kowalski + Unslop', value: 'core' },
+          { label: 'Minimal / On-Demand', hint: 'Zero install; run on demand via npx/uvx', value: 'minimal' },
+        ],
+      });
+    }
+  }
 
   console.log(`${sym.bar}`);
-  console.log(`${sym.bar}  ${c.teal}Fetching and writing rule files...${c.reset}`);
-
-  const coreOs = fetchFile('00-core-os.md');
-  const uiMaster = fetchFile('01-ui-ux-master.md');
+  console.log(`${sym.bar}  ${c.teal}Writing latest rule files...${c.reset}`);
 
   const writeTarget = (baseDir, agentList) => {
     agentList.forEach((ag) => {
@@ -243,12 +323,12 @@ async function main() {
     }
   }
 
-  console.log(`${sym.bar}  ${sym.success} Rule files configured successfully.`);
+  console.log(`${sym.bar}  ${sym.success} Rules synced & replaced for [${agents.join(', ')}].`);
 
   if (tooling === 'full' || tooling === 'core') {
-    console.log(`${sym.bar}  ${c.amber}◇${c.reset}  Installing skill packs & Impeccable...`);
+    console.log(`${sym.bar}  ${c.amber}◇${c.reset}  Installing skill packs (including Unslop & Impeccable)...`);
     try {
-      execSync('npx -y skills add mattpocock/skills obra/superpowers emilkowalski/skills -g', { stdio: 'ignore' });
+      execSync('npx -y skills add mattpocock/skills obra/superpowers emilkowalski/skills heydamir/unslop -g', { stdio: 'ignore' });
       execSync('npm install -g impeccable', { stdio: 'ignore' });
     } catch {}
   }
@@ -266,9 +346,7 @@ async function main() {
   }
 
   console.log(`${sym.bar}`);
-  console.log(`${c.mint}└  Installation complete! All agents are armed and ready.${c.reset}\n`);
-
-  // Explicitly close standard streams and exit to release terminal prompt
+  console.log(`${c.mint}└  All done! Your agents are updated and ready.${c.reset}\n`);
   process.exit(0);
 }
 
