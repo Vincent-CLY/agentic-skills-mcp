@@ -326,9 +326,9 @@ async function main() {
   console.log(`${sym.bar}  ${sym.success} Rules synced & replaced for [${agents.join(', ')}].`);
 
   if (tooling === 'full' || tooling === 'core') {
-    console.log(`${sym.bar}  ${c.amber}◇${c.reset}  Installing skill packs (including Unslop & Impeccable)...`);
+    console.log(`${sym.bar}  ${c.amber}◇${c.reset}  Installing skill packs (including Unslop, Anatomy & Impeccable)...`);
     try {
-      execSync('npx -y skills add mattpocock/skills obra/superpowers emilkowalski/skills heydamir/unslop -g', { stdio: 'ignore' });
+      execSync('npx -y skills add mattpocock/skills obra/superpowers emilkowalski/skills heydamir/unslop wheresryan22/anatomy -g', { stdio: 'ignore' });
       execSync('npm install -g impeccable', { stdio: 'ignore' });
     } catch {}
   }
