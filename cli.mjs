@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import fs from 'node:fs';
 import path from 'node:path';
+import tty from 'node:tty';
 import crypto from 'node:crypto';
 import { execSync } from 'node:child_process';
 import readline from 'node:readline';
@@ -14,7 +15,6 @@ const TARGET_DIR = process.env.INIT_CWD || process.cwd();
 const c = {
   reset: '\x1b[0m',
   bold: '\x1b[1m',
-  dim: '\x1b[2m',
   cyanDeep: '\x1b[38;2;0;95;115m',     // #005f73 - Structural vertical guide lines
   teal: '\x1b[38;2;10;147;150m',       // #0a9396 - Step icons & hints
   mint: '\x1b[38;2;148;210;189m',      // #94d2bd - Active hover text & success
@@ -38,23 +38,39 @@ const sym = {
 const stripAnsi = (str) => str.replace(/\x1b\[[0-9;]*[a-zA-Z]/g, '');
 const sha256 = (str) => crypto.createHash('sha256').update(str.trim()).digest('hex');
 
+// Initialize TTY Input Stream ONCE globally to prevent skipped prompts
+let sharedInput = process.stdin;
+if (!process.stdin.isTTY) {
+  try {
+    const fd = fs.openSync('/dev/tty', 'r');
+    sharedInput = new tty.ReadStream(fd);
+  } catch {
+    sharedInput = process.stdin;
+  }
+}
+readline.emitKeypressEvents(sharedInput);
+
 async function runSelect({ title, items, multi = false }) {
   return new Promise((resolve) => {
     let cursor = 0;
     let lastRenderedRows = 0;
+    let ready = false;
     const selected = new Set(multi ? items.map((it, idx) => (it.checked ? idx : -1)).filter((i) => i >= 0) : []);
 
-    const input = process.stdin.isTTY ? process.stdin : fs.createReadStream('/dev/tty');
     const output = process.stdout;
-    readline.emitKeypressEvents(input);
-    if (input.isTTY) input.setRawMode(true);
-
+    sharedInput.resume();
+    if (typeof sharedInput.setRawMode === 'function') sharedInput.setRawMode(true);
     output.write('\x1b[?25l');
+
+    // Debounce 80ms so previous Enter keystroke (\r\n) never skips the next menu
+    setTimeout(() => {
+      ready = true;
+    }, 80);
 
     const cleanup = () => {
       output.write('\x1b[?25h');
-      if (input.isTTY) input.setRawMode(false);
-      if (typeof input.pause === 'function') input.pause();
+      if (typeof sharedInput.setRawMode === 'function') sharedInput.setRawMode(false);
+      sharedInput.pause();
     };
 
     const render = (first = false) => {
@@ -91,8 +107,9 @@ async function runSelect({ title, items, multi = false }) {
     render(true);
 
     const onKey = (_, key) => {
-      if (!key) return;
+      if (!key || !ready) return;
       if (key.ctrl && key.name === 'c') {
+        sharedInput.removeListener('keypress', onKey);
         cleanup();
         output.write(`\n\r${sym.bar}  ${c.burnt}Setup cancelled.${c.reset}\n\r`);
         process.exit(0);
@@ -107,8 +124,9 @@ async function runSelect({ title, items, multi = false }) {
         if (selected.has(cursor)) selected.delete(cursor);
         else selected.add(cursor);
         render();
-      } else if (key.name === 'return') {
-        input.removeListener('keypress', onKey);
+      } else if (key.name === 'return' || key.name === 'enter') {
+        ready = false;
+        sharedInput.removeListener('keypress', onKey);
         cleanup();
         if (lastRenderedRows > 0) {
           output.write(`\x1b[${lastRenderedRows}A\r\x1b[0J`);
@@ -119,13 +137,13 @@ async function runSelect({ title, items, multi = false }) {
       }
     };
 
-    input.on('keypress', onKey);
+    sharedInput.on('keypress', onKey);
   });
 }
 
-function fetchRemoteOrLocal(filename, preferRemote = false) {
+function fetchRemoteOrLocal(filename, forceRemote = false) {
   const localPath = path.join(path.dirname(new URL(import.meta.url).pathname), filename);
-  if (!preferRemote && fs.existsSync(localPath)) {
+  if (!forceRemote && fs.existsSync(localPath)) {
     return fs.readFileSync(localPath, 'utf8');
   }
   return execSync(`curl -fsSL "${RAW_URL}/${filename}?t=${Date.now()}"`).toString();
@@ -169,70 +187,26 @@ async function main() {
   const forceUpdate = args.includes('--update') || args.includes('-u');
   const autoMode = args.includes('--auto');
 
-  console.log(`\n${c.cyanDeep}┌  Agent-OS Setup & Updater${c.reset} ${c.teal}(Ponytail x ADHD x Ocean-Amber Palette)${c.reset}`);
-  console.log(`${sym.bar}  Target Directory: ${c.sand}${TARGET_DIR}${c.reset}`);
-
-  // Fetch latest rules from GitHub (or bundle) first so we can compare hashes
-  const coreOs = fetchRemoteOrLocal('00-core-os.md', forceUpdate);
-  const uiMaster = fetchRemoteOrLocal('01-ui-ux-master.md', forceUpdate);
-  const { detected, outdated } = detectInstalledAgents(TARGET_DIR, sha256(coreOs), sha256(uiMaster));
-
-  if (detected.length > 0) {
-    const statusBadge = outdated
-      ? `${c.amber}⚡ Update available from GitHub!${c.reset}`
-      : `${c.mint}✔ Rules match latest version${c.reset}`;
-    console.log(`${sym.bar}  Detected Existing: ${c.mint}${detected.join(', ')}${c.reset} — ${statusBadge}`);
-  }
-  console.log(`${sym.bar}`);
+  console.log(`\n${c.cyanDeep}┌  Agent-OS Installer${c.reset} ${c.teal}(Ponytail x ADHD x Manware)${c.reset}`);
+  console.log(`${sym.bar}  Target Directory: ${c.sand}${TARGET_DIR}${c.reset}\n${sym.bar}`);
 
   let scope = 'project';
-  let agents = detected.length > 0 ? detected : ['cline', 'copilot'];
-  let tooling = 'minimal';
+  let agents = ['cline', 'copilot'];
+  let tooling = 'full';
+  let forceRemoteFetch = forceUpdate;
 
-  if (forceUpdate && detected.length > 0) {
-    console.log(`${sym.bar}  ${c.amber}⚡ Running instant --update for [${detected.join(', ')}]...${c.reset}`);
-  } else if (!autoMode) {
-    if (detected.length > 0) {
-      const action = await runSelect({
-        title: 'Existing Agent-OS installation found. What would you like to do?',
-        items: [
-          { label: '⚡ Quick Update / Replace All Existing Rules', hint: `Updates [${detected.join(', ')}] in 1 click`, value: 'quick-update' },
-          { label: '🔧 Reconfigure Agents & Tooling', hint: 'Add/remove AI agents or install CLI packages', value: 'reconfigure' },
-        ],
-      });
+  if (!autoMode && !forceUpdate) {
+    // Main 3-Option Menu requested by user
+    const mode = await runSelect({
+      title: 'Select installation mode:',
+      items: [
+        { label: '1) Full Installation (Default)', hint: '1-click: Cline + Copilot rules + all skill packs & tools', value: 'full-install' },
+        { label: '2) Custom / Trimmed Installation', hint: 'Choose scope, specific AI agents & lightweight options', value: 'custom' },
+        { label: '3) Check & Apply Updates', hint: 'Fetch latest GitHub rules & replace existing files', value: 'update' },
+      ],
+    });
 
-      if (action === 'quick-update') {
-        tooling = 'minimal';
-      } else {
-        scope = await runSelect({
-          title: 'Where do you want to install the agent rules?',
-          items: [
-            { label: 'Current Project only', hint: 'Isolated; preserves native AGENTS.md', value: 'project' },
-            { label: 'Global system directory only', hint: 'Applies to all new windows', value: 'global' },
-            { label: 'Both Project and Global', hint: 'Project + Global', value: 'both' },
-          ],
-        });
-        agents = await runSelect({
-          title: 'Which AI agents are you using? (Space to toggle, Enter to confirm)',
-          multi: true,
-          items: [
-            { label: 'VS Code - Cline', hint: '.clinerules/', value: 'cline', checked: detected.includes('cline') },
-            { label: 'VS Code - GitHub Copilot', hint: '.github/instructions/', value: 'copilot', checked: detected.includes('copilot') },
-            { label: 'Cursor', hint: '.cursor/rules/', value: 'cursor', checked: detected.includes('cursor') },
-            { label: 'Claude Code', hint: '.claude/rules/', value: 'claude', checked: detected.includes('claude') },
-            { label: 'OpenAI Codex / Hermes', hint: '.agents/', value: 'codex', checked: detected.includes('codex') },
-          ],
-        });
-        tooling = await runSelect({
-          title: 'Skill Packs & Automation Tooling Level:',
-          items: [
-            { label: 'Complete Setup / Update All', hint: 'Skills + Unslop + Impeccable + Playwright + Graphify', value: 'full' },
-            { label: 'Core Skills Only', hint: 'Matt Pocock + Superpowers + Emil Kowalski + Unslop', value: 'core' },
-            { label: 'Rules Only (Skip CLI re-install)', hint: 'Fastest; uses npx/uvx on demand', value: 'minimal' },
-          ],
-        });
-      }
-    } else {
+    if (mode === 'custom') {
       scope = await runSelect({
         title: 'Where do you want to install the agent rules?',
         items: [
@@ -241,7 +215,8 @@ async function main() {
           { label: 'Both Project and Global', hint: 'Project + Global', value: 'both' },
         ],
       });
-      agents = await runSelect({
+
+      const chosenAgents = await runSelect({
         title: 'Which AI agents are you using? (Space to toggle, Enter to confirm)',
         multi: true,
         items: [
@@ -252,19 +227,40 @@ async function main() {
           { label: 'OpenAI Codex / Hermes', hint: '.agents/', value: 'codex', checked: false },
         ],
       });
+      if (chosenAgents.length > 0) agents = chosenAgents;
+
       tooling = await runSelect({
         title: 'Skill Packs & Automation Tooling Level:',
         items: [
-          { label: 'Complete Setup', hint: 'Skills + Unslop + Impeccable + Playwright + Graphify', value: 'full' },
-          { label: 'Core Skills Only', hint: 'Matt Pocock + Superpowers + Emil Kowalski + Unslop', value: 'core' },
-          { label: 'Minimal / On-Demand', hint: 'Zero install; run on demand via npx/uvx', value: 'minimal' },
+          { label: 'Minimal / Rules Only (Trimmed)', hint: 'Zero pre-install; run on demand via npx/uvx', value: 'minimal' },
+          { label: 'Core Skills Only', hint: 'Matt Pocock + Superpowers + Emil Kowalski + Unslop + Anatomy', value: 'core' },
+          { label: 'Complete Setup', hint: 'All Skills + Impeccable + Playwright + Graphify', value: 'full' },
         ],
       });
+    } else if (mode === 'update') {
+      forceRemoteFetch = true;
+      tooling = 'minimal';
     }
   }
 
   console.log(`${sym.bar}`);
-  console.log(`${sym.bar}  ${c.teal}Writing latest rule files...${c.reset}`);
+  console.log(`${sym.bar}  ${c.teal}Fetching latest rule files...${c.reset}`);
+
+  const coreOs = fetchRemoteOrLocal('00-core-os.md', forceRemoteFetch);
+  const uiMaster = fetchRemoteOrLocal('01-ui-ux-master.md', forceRemoteFetch);
+
+  if (forceRemoteFetch) {
+    const { detected, outdated } = detectInstalledAgents(TARGET_DIR, sha256(coreOs), sha256(uiMaster));
+    if (detected.length > 0) {
+      agents = detected;
+      const statusMsg = outdated
+        ? `${c.amber}⚡ Newer version found on GitHub! Updating [${detected.join(', ')}]...${c.reset}`
+        : `${c.mint}✔ Already on latest version. Refreshing [${detected.join(', ')}]...${c.reset}`;
+      console.log(`${sym.bar}  ${statusMsg}`);
+    } else {
+      console.log(`${sym.bar}  ${c.amber}No existing rules found in project; installing default [cline, copilot]...${c.reset}`);
+    }
+  }
 
   const writeTarget = (baseDir, agentList) => {
     agentList.forEach((ag) => {
@@ -323,10 +319,10 @@ async function main() {
     }
   }
 
-  console.log(`${sym.bar}  ${sym.success} Rules synced & replaced for [${agents.join(', ')}].`);
+  console.log(`${sym.bar}  ${sym.success} Rules configured for [${agents.join(', ')}].`);
 
   if (tooling === 'full' || tooling === 'core') {
-    console.log(`${sym.bar}  ${c.amber}◇${c.reset}  Installing skill packs (including Unslop, Anatomy & Impeccable)...`);
+    console.log(`${sym.bar}  ${c.amber}◇${c.reset}  Installing skill packs (Matt Pocock, Superpowers, Emil, Unslop, Anatomy, Impeccable)...`);
     try {
       execSync('npx -y skills add mattpocock/skills obra/superpowers emilkowalski/skills heydamir/unslop wheresryan22/anatomy -g', { stdio: 'ignore' });
       execSync('npm install -g impeccable', { stdio: 'ignore' });
@@ -346,7 +342,7 @@ async function main() {
   }
 
   console.log(`${sym.bar}`);
-  console.log(`${c.mint}└  All done! Your agents are updated and ready.${c.reset}\n`);
+  console.log(`${c.mint}└  All done! Your agents are armed and ready.${c.reset}\n`);
   process.exit(0);
 }
 
